@@ -185,7 +185,7 @@ class Geo extends EloquentTreeItem {
         if(empty($fields)){
             $this->hidden = [];
         } else {
-            $this->hidden = ['id','parent_id','left','right','depth','name','alternames','country','level','population','lat','long'];
+            $this->hidden = ['id','parent_id','left','right','depth','name','alternames','country','level','population','lat','lng'];
             foreach ($fields as $field) {
                 $index = array_search($field, $this->hidden);
                 if($index !== false){

@@ -26,7 +26,8 @@ class Geo extends Migration
                 $table->char('level', 10);
                 $table->bigInteger('population');
                 $table->decimal('lat',9,6);
-                $table->decimal('long',9,6);
+                $table->decimal('lng',9,6);
+                $table->char('timezone', 30);
             });
         }
 
@@ -38,6 +39,6 @@ class Geo extends Migration
      * @return void
      */
     public function down() {
-        Schema::drop('geo');
+//        Schema::drop('geo');
     }
 }

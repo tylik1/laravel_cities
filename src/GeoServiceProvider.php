@@ -36,6 +36,7 @@ class GeoServiceProvider extends ServiceProvider
             $this->commands([
                 \Igaster\LaravelCities\commands\seedGeoFile::class,
                 \Igaster\LaravelCities\commands\seedJsonFile::class,
+                \Igaster\LaravelCities\commands\truncTable::class,
             ]);
         }
 

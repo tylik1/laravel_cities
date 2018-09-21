@@ -84,5 +84,4 @@ class EloquentTreeItem extends Eloquent {
             $child->printTree();
     }
 
-
 }
