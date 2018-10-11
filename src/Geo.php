@@ -5,9 +5,9 @@ use Illuminate\Support\Facades\Route;
 use Igaster\LaravelCities\dbTree\EloquentTreeItem;
 
 class Geo extends EloquentTreeItem {
-	protected $table = 'geo';
-	protected $guarded = [];
-	public $timestamps = false;
+    protected $table = 'geo';
+    protected $guarded = [];
+    public $timestamps = false;
 
     const LEVEL_COUNTRY = 'PCLI';
     const LEVEL_CAPITAL = 'PPLC';
@@ -54,21 +54,29 @@ class Geo extends EloquentTreeItem {
     }
 
     public function scopeChildren($query){
-        return $query->where(function($query) 
+        return $query->where(function($query)
         {
             $query->where('left', '>', $this->left)
                 ->where('right', '<', $this->right)
                 ->where('depth', $this->depth+1);
-        });        
+        });
     }
 
-    public function scopeSearch($query,$search){
+    public function scopeSearch($query,$search, $alterNames = false){
         $search = '%'.mb_strtolower($search).'%';
 
-        return $query->where(function($query) use($search)
+        return $query->where(function($query) use($search, $alterNames)
         {
-            $query->whereRaw('LOWER(alternames) LIKE ?', [$search])
-                ->orWhereRaw('LOWER(name) LIKE ?', [$search]);
+            if($alterNames) {
+                $query = $query->whereRaw('LOWER(alternames::text) LIKE ?', [$search]);
+            }
+
+            else{
+                $query = $query->whereRaw('LOWER(name) LIKE ?', [$search]);
+            }
+
+            return $query;
+
         });
 
     }
@@ -90,7 +98,7 @@ class Geo extends EloquentTreeItem {
     // ----------------------------------------------
 
     // public function setXxxAttribute($value){
-    //     $this->attributes['xxx'] = $value;     
+    //     $this->attributes['xxx'] = $value;
     // }
 
     // ----------------------------------------------
@@ -103,11 +111,15 @@ class Geo extends EloquentTreeItem {
     // ----------------------------------------------
 
     // search in `name` and `alternames` / return collection
-    public static function searchNames($name, Geo $parent =null){
-        $query = self::search($name)->orderBy('name', 'ASC');
+    public static function searchNames($name, Geo $parent =null, $limit = null, $alterNames = false){
+        $query = self::search($name, $alterNames)->orderBy('name', 'ASC');
 
         if ($parent){
             $query->areDescentants($parent);
+        }
+
+        if($limit) {
+            $query->limit($limit);
         }
 
         return $query->get();
@@ -132,7 +144,7 @@ class Geo extends EloquentTreeItem {
     public function isChildOf(Geo $item){
         return ($this->left > $item->left) && ($this->right < $item->right) && ($this->depth == $item->depth+1);
     }
-    
+
     // is imediate Parent of $item ?
     public function isParentOf(Geo $item){
         return ($this->left < $item->left) && ($this->right > $item->right) && ($this->depth == $item->depth-1);
@@ -148,7 +160,7 @@ class Geo extends EloquentTreeItem {
         return ($this->left < $item->left) && ($this->right > $item->right);
     }
 
-    // retrieve by name  
+    // retrieve by name
     public static function findName($name){
         return self::where('name',$name)->first();
     }
@@ -175,7 +187,7 @@ class Geo extends EloquentTreeItem {
 
 
 
-    // Return only $fields as Json. null = Show all 
+    // Return only $fields as Json. null = Show all
     public function fliterFields($fields = null){
 
         if (is_string($fields)){ // Comma Seperated List (eg Url Param)
