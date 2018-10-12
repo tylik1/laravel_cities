@@ -93,6 +93,13 @@ class Geo extends EloquentTreeItem {
         });
     }
 
+    public function scopeBelongToCountry ($query, Geo $parent) {
+        return $query->where(function($query) use ($parent) {
+            $query->where('country', $parent->country)
+                ->where('level', '!=', 'PCLI');
+        });
+    }
+
     public function scopeTest($query)
     {
         return $query;
@@ -120,12 +127,13 @@ class Geo extends EloquentTreeItem {
         $query = self::search($name, $alterNames)->orderBy('name', 'ASC');
 
         if ($parent) {
-            $query->areDescentants($parent);
+            $query->belongToCountry($parent);
         }
 
         if ($limit) {
             $query->limit($limit);
         }
+//        $test = $query->toSql();
 
         return $query->get();
     }
