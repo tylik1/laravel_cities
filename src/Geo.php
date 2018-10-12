@@ -176,8 +176,8 @@ class Geo extends EloquentTreeItem {
     }
 
     // get all Ancnstors (Collection) ordered by level (Country -> City)
-    public function getAncensors(){
-        return self::ancenstors()->orderBy('depth')->get();
+    public function getAncensors($orderBy = 'asc'){
+        return self::ancenstors()->orderBy('depth', $orderBy)->get();
     }
 
     // get all Descendants (Collection) Alphabetical
